@@ -1,0 +1,233 @@
+<!-- roulette.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="balance.js"></script>
+    <title>Roulette</title>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">
+            <img src="/img/logo.png" alt="logo">
+        </div>
+        <div class="nav-searchbar" id="searchbar"></div>
+    <div class="nav-menu" id="menu">
+        <div class="nav-navigation">
+        <a href="#" class="link-active">Home</a>
+        <a href="#">Games</a>
+        <span class="promo" id="promo">Promo</span>
+        <a href="#">Help</a>
+    </div>
+        <div class="nav-profile">
+            <div class="username" id="display-username">Username</div>
+            <div class="profile-picture">
+                <img id="profile-picture" src="" alt="Profile Picture">
+            </div>
+            <div class="nav-balance">
+                <img class="balance-icon" src="img/coin.png" alt="balance-icon">
+                <div id="balance-display"></div>
+                <button><img src="img/add.png" alt="add"></button>
+            </div>
+            <div class="nav-settings">
+                <img src="img/settings.png" alt="Settings" id="settings">
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-hamburger">
+        <img src="img/hamburger.png" alt="Menu" id="hamburger">
+    </div>
+</nav>
+
+<div class="game-container">
+    <h1>Roulette</h1>
+    <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
+    <select id="color-choice">
+        <option value="red">Red</option>
+        <option value="black">Black</option>
+        <option value="green">Green</option>
+    </select>
+    <button id="play-button">Play</button>
+    <div id="roulette-board"></div>
+</div>
+
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="settings-close">&times;</span>
+        <h2>Settings</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username"><br><br>
+        <label for="profile-pic">Profile Picture URL:</label>
+        <input type="text" id="profile-pic" placeholder="Enter URL of profile picture"><br><br>
+        <button id="save-settings">Save</button>
+    </div>
+</div>
+
+<div id="promo-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="promo-close">&times;</span>
+        <h2>Promo Code</h2>
+        <label for="promo-code">Enter Promo Code:</label>
+        <input type="text" id="promo-code" placeholder="Enter your code">
+        <button id="apply-promo">Apply</button>
+    </div>
+</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    createRouletteBoard();
+    document.getElementById('play-button').addEventListener('click', playRoulette);
+});
+
+function createRouletteBoard() {
+    const board = document.getElementById('roulette-board');
+    const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
+
+    colors.forEach((color, index) => {
+        const slot = document.createElement('div');
+        slot.classList.add('roulette-slot', color);
+        slot.style.transform = `rotate(${index * (360 / colors.length)}deg)`;
+        board.appendChild(slot);
+    });
+}
+
+function playRoulette() {
+    const betAmount = parseFloat(document.getElementById('bet-amount').value);
+    const chosenColor = document.getElementById('color-choice').value;
+    const winningColor = getWinningColor();
+    const sectors = document.querySelectorAll('#roulette-board .roulette-slot');
+    const spinTime = 3000; // Czas kręcenia ruletki
+    let winnerIndex;
+
+    if (getBalance() >= betAmount) {
+        subtractBalance(betAmount);
+
+        // Wyznaczenie wygrywającego koloru
+        sectors.forEach((sector, index) => {
+            if (sector.classList.contains(winningColor)) {
+                winnerIndex = index;
+            }
+        });
+
+        // Kręcenie ruletką
+        const board = document.getElementById('roulette-board');
+        board.style.transition = `transform ${spinTime}ms ease-out`;
+        board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
+
+        setTimeout(() => {
+            board.style.transition = '';
+            board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
+            sectors[winnerIndex].classList.add('winner');
+            
+            if (winningColor === chosenColor) {
+                const winnings = betAmount * (winningColor === 'green' ? 14 : 2);
+                addBalance(winnings);
+                alert(`You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`);
+            } else {
+                alert(`You lost! The ball landed on ${winningColor}.`);
+            }
+            sectors.forEach(sector => sector.classList.remove('winner'));
+        }, spinTime);
+    } else {
+        alert('Not enough balance to play!');
+    }
+}
+
+function getWinningColor() {
+    const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
+    const randomIndex = Math.floor(Math.random() * colors.length);
+    return colors[randomIndex];
+}
+
+//OBSŁUGA MENU
+
+const menuBtn = document.getElementById("hamburger");
+    const menu = document.getElementById("menu");
+
+    menuBtn.addEventListener('click', function(){
+        menu.classList.toggle("menu-open");
+    });
+
+     //MODAL
+const settingsModal = document.getElementById('settings-modal');
+const settingsBtn = document.getElementById('settings');
+const settingsClose = document.getElementById('settings-close');
+const saveSettings = document.getElementById('save-settings');
+
+settingsBtn.onclick = function () {
+    settingsModal.style.display = 'block';
+};
+
+settingsClose.onclick = function () {
+    settingsModal.style.display = 'none';
+};
+
+saveSettings.onclick = function () {
+    const username = document.getElementById('username').value;
+    const profilePic = document.getElementById('profile-pic').value;
+
+    if (username) {
+        localStorage.setItem('username', username);
+        document.getElementById('display-username').textContent = username;
+    }
+
+    if (profilePic) {
+        localStorage.setItem('profilePic', profilePic);
+        document.getElementById('profile-picture').src = profilePic;
+    }
+
+    settingsModal.style.display = 'none';
+};
+
+// Ładowanie ustawień z localStorage
+window.onload = function () {
+    const savedUsername = localStorage.getItem('username');
+    const savedProfilePic = localStorage.getItem('profilePic');
+
+    if (savedUsername) {
+        document.getElementById('display-username').textContent = savedUsername;
+    }
+
+    if (savedProfilePic) {
+        document.getElementById('profile-picture').src = savedProfilePic;
+    }
+};
+
+
+// Promo Modal
+const promoModal = document.getElementById('promo-modal');
+const promoBtn = document.getElementById('promo');
+const promoClose = document.getElementById('promo-close');
+const applyPromo = document.getElementById('apply-promo');
+let isValid = true;
+
+promoBtn.onclick = function () {
+    promoModal.style.display = 'block';
+};
+
+promoClose.onclick = function () {
+    promoModal.style.display = 'none';
+};
+
+applyPromo.onclick = function () {
+    const promoCode = document.getElementById('promo-code').value;
+
+    if (promoCode === 'SKIBIDI20') {
+        if (isValid == true) {
+        const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
+        const newBalance = currentBalance + 20;
+        localStorage.setItem('balance', newBalance.toFixed(2));
+        alert('Promo code applied! Your balance has been increased by 20.00.');
+        updateBalanceDisplay();
+        promoModal.style.display = 'none';
+        isValid = false;
+        }
+    } else {
+        alert('Invalid promo code!');
+    }
+};
+    </script>
+</body>
+</html>
