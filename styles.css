@@ -59,6 +59,7 @@ nav {
     color: #777777;
     text-decoration: none;
     cursor: pointer;
+    text-align: center;
   }
   .nav-menu a:hover,
   .promo:hover {
