@@ -237,6 +237,7 @@ h1{
 }
 .header-carousel{
   position: relative;
+  display: none;
 }
 
 
