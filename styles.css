@@ -75,7 +75,6 @@ nav {
     width: 26px;
     background-color: #777777;
     border-radius: 100%;
-    background-image: url(img/pfp.jpg);
     background-size: contain;
     background-position: center;
   }
@@ -174,8 +173,71 @@ button {
   font-size: 1rem;
 
 }
-
-
+select{
+  background-color: #121215;
+  color: #fafafa;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.4rem;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+}
+option {
+  border: none;
+  outline: none;
+  background-color: #1B1B22;
+}
+select:after {
+background-color: #5B509F
+;}
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+h1{
+  font-size: 3rem;
+}
+.content-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.content-list {
+  width: 100%;
+}
+.banner {
+  width: 76rem;
+  height: 18rem;
+  background-color:#121215;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 2rem;
+  top: 0;
+  background-image: url(img/banner1.png);
+}
+#slide-left, 
+#slide-right {
+  position: absolute;
+  top: 50%;
+  background-color: #000000a1;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  width: 1rem;
+  text-align: center;
+  cursor: pointer;
+}
+#slide-left {
+  left: 20%;
+}
+#slide-right {
+  right: 20%;
+}
+.header-carousel{
+  position: relative;
+}
 
 
 /*COOKIE CLICKER*/
@@ -248,14 +310,17 @@ button {
     border: 2px solid #000;
     margin: 0 auto;
     overflow: hidden;
+    background-image: url(img/roulette.png);
+    background-position: center;
+    background-size: cover;
 }
 .roulette-slot {
-    position: absolute;
+    /* position: absolute;
     width: 50%;
     height: 50%;
     border: 1px solid #000;
     transform-origin: 100% 100%;
-    box-sizing: border-box;
+    box-sizing: border-box; */
 }
 .red { background-color: red; }
 .black { background-color: black; }
@@ -308,6 +373,13 @@ button {
 
 
 /*BREAKPOINTS*/
+@media only screen and (max-width: 1200px) {
+
+  .modal-content {
+    width: 70%;
+  }
+}
+
 @media only screen and (max-width: 900px) {
   .nav-menu {
     display: none; 
@@ -356,5 +428,36 @@ button {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+    .grid-container {
+      grid-template-columns: repeat(7, 50px);
+      grid-template-rows: repeat(7, 50px);
+      gap: 3px;
+      margin-top: 4px;
+  }
+
+  .grid-item {
+      width: 50px;
+      height: 50px;
+  }
+  .modal-content {
+    width: 90%;
+  }
+  #remaining-diamonds {
+    margin-bottom: 1rem;
+  }
+}
+@media only screen and (max-width: 400px) {
+  .grid-container {
+    grid-template-columns: repeat(7, 40px);
+    grid-template-rows: repeat(7, 40px);
+    gap: 2px;
+    margin-top: 1px;
+}
+
+.grid-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
 
 }

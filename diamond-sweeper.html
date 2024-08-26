@@ -16,15 +16,18 @@
         <div class="nav-searchbar" id="searchbar"></div>
     <div class="nav-menu" id="menu">
         <div class="nav-navigation">
-        <a href="#" class="link-active">Home</a>
-        <a href="#">Games</a>
-        <span class="promo" id="promo">Promo</span>
-        <a href="#">Help</a>
-    </div>
+            <a href="index.html">Home</a>
+            <a href="#">Games</a>
+            <span class="promo" id="promo">Promo</span>
+            <a href="#">Help</a>
+            <a href="roulette.html">Roulette</a>
+            <a href="diamond-sweeper.html" class="link-active">Diamond Sweeper</a>
+            <a href="cookie-clicker.html">Cookie Clicker</a>
+            </div>
         <div class="nav-profile">
             <div class="username" id="display-username">Username</div>
             <div class="profile-picture">
-                <img id="profile-picture" src="" alt="Profile Picture">
+                <img id="profile-picture" src="">
             </div>
             <div class="nav-balance">
                 <img class="balance-icon" src="img/coin.png" alt="balance-icon">
@@ -44,14 +47,18 @@
 
 <div class="game-container">
     <h1>Diamond Sweeper</h1>
-    <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
-    <select id="difficulty">
-        <option value="1.5">1.5x</option>
-        <option value="2">2x</option>
-        <option value="3">3x</option>
-        <option value="5">5x</option>
-    </select>
+    <span>
+        <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
+        <select id="difficulty">
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+            <option value="5">5x</option>
+        </select>
+    </span>
+    <br>
     <button id="play-button">Play</button>
+    <br>
     <div id="remaining-diamonds">Pozostało Ci 7 diamentów</div>
     <div id="game-board" class="grid-container"></div>
 </div>
@@ -83,6 +90,9 @@
 });
 
 document.getElementById('play-button').addEventListener('click', () => {
+
+    document.getElementById('play-button').disabled = true;
+
     const betAmount = parseFloat(document.getElementById('bet-amount').value);
     const difficulty = parseFloat(document.getElementById('difficulty').value);
     const bombsCount = getBombsCount(difficulty);
@@ -92,6 +102,7 @@ document.getElementById('play-button').addEventListener('click', () => {
         startGame(betAmount, difficulty, bombsCount);
     } else {
         alert('Not enough balance to play!');
+        document.getElementById('play-button').disabled = false;
     }
 });
 
@@ -174,7 +185,9 @@ function revealBoard(board) {
 
     setTimeout(() => {
         initializeGame();  // Resetujemy planszę po krótkim opóźnieniu
+        document.getElementById('play-button').disabled = false;
     }, 2000);  // 2 sekundy opóźnienia przed zresetowaniem gry
+    
 }
 
 function updateRemainingDiamonds(remaining) {
@@ -204,15 +217,15 @@ function chunkArray(array, chunkSize) {
 function getBombsCount(difficulty) {
     switch (difficulty) {
         case 1.5:
-            return 17;
+            return 10;
         case 2:
-            return 22;
+            return 17;
         case 3:
-            return 27;
+            return 25;
         case 5:
             return 32;
         default:
-            return 17;
+            return 10;
     }
 }
 

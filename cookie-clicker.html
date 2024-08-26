@@ -16,15 +16,18 @@
         <div class="nav-searchbar" id="searchbar"></div>
     <div class="nav-menu" id="menu">
         <div class="nav-navigation">
-        <a href="#" class="link-active">Home</a>
-        <a href="#">Games</a>
-        <span class="promo" id="promo">Promo</span>
-        <a href="#">Help</a>
-    </div>
+            <a href="index.html">Home</a>
+            <a href="#">Games</a>
+            <span class="promo" id="promo">Promo</span>
+            <a href="#">Help</a>
+            <a href="roulette.html">Roulette</a>
+            <a href="diamond-sweeper.html">Diamond Sweeper</a>
+            <a href="cookie-clicker.html" class="link-active">Cookie Clicker</a>
+            </div>
         <div class="nav-profile">
             <div class="username" id="display-username">Username</div>
             <div class="profile-picture">
-                <img id="profile-picture" src="" alt="Profile Picture">
+                <img id="profile-picture" src="">
             </div>
             <div class="nav-balance">
                 <img class="balance-icon" src="img/coin.png" alt="balance-icon">
@@ -73,19 +76,45 @@
         <button id="apply-promo">Apply</button>
     </div>
 </div>
-    <script>
-        let clickValue = 0.01;
-        let upgradeCost = 10.00;
+    <script>  
+    let clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
+    let upgradeCost = parseFloat(localStorage.getItem('upgradeCost')) || 10.00;
 
+        // Inicjalizacja stanu gry po załadowaniu strony
+        window.onload = function() {
+            updateBalanceDisplay();
+            document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
+            
+
+            // Ładowanie ustawień użytkownika
+            const savedUsername = localStorage.getItem('username');
+            const savedProfilePic = localStorage.getItem('profilePic');
+
+            if (savedUsername) {
+                document.getElementById('display-username').textContent = savedUsername;
+            }
+
+            if (savedProfilePic) {
+                document.getElementById('profile-picture').src = savedProfilePic;
+            }
+        };
+        document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
+        // Obsługa kliknięcia w przycisk ciasteczka
         document.getElementById('cookie-button').addEventListener('click', () => {
             addBalance(clickValue);
         });
 
+        // Obsługa kliknięcia w przycisk ulepszenia
         document.getElementById('upgrade-button').addEventListener('click', () => {
             if (getBalance() >= upgradeCost) {
                 subtractBalance(upgradeCost);
                 clickValue *= 2;
                 upgradeCost *= 3;
+
+                // Zapisanie nowych wartości w localStorage
+                localStorage.setItem('clickValue', clickValue.toFixed(2));
+                localStorage.setItem('upgradeCost', upgradeCost.toFixed(2));
+
                 document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
             } else {
                 alert('Not enough balance to upgrade!');

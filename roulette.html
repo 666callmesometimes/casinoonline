@@ -16,15 +16,18 @@
         <div class="nav-searchbar" id="searchbar"></div>
     <div class="nav-menu" id="menu">
         <div class="nav-navigation">
-        <a href="#" class="link-active">Home</a>
+        <a href="index.html">Home</a>
         <a href="#">Games</a>
         <span class="promo" id="promo">Promo</span>
         <a href="#">Help</a>
-    </div>
+        <a href="roulette.html" class="link-active">Roulette</a>
+            <a href="diamond-sweeper.html">Diamond Sweeper</a>
+            <a href="cookie-clicker.html">Cookie Clicker</a>
+        </div>
         <div class="nav-profile">
             <div class="username" id="display-username">Username</div>
             <div class="profile-picture">
-                <img id="profile-picture" src="" alt="Profile Picture">
+                <img id="profile-picture" src="">
             </div>
             <div class="nav-balance">
                 <img class="balance-icon" src="img/coin.png" alt="balance-icon">
@@ -44,13 +47,15 @@
 
 <div class="game-container">
     <h1>Roulette</h1>
+    <span>
     <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
     <select id="color-choice">
         <option value="red">Red</option>
         <option value="black">Black</option>
         <option value="green">Green</option>
     </select>
-    <button id="play-button">Play</button>
+</span><br>
+    <button id="play-button">Play</button><br>
     <div id="roulette-board"></div>
 </div>
 
@@ -94,6 +99,10 @@ function createRouletteBoard() {
 }
 
 function playRoulette() {
+
+    const playButton = document.getElementById('play-button');
+    playButton.disabled = true;
+
     const betAmount = parseFloat(document.getElementById('bet-amount').value);
     const chosenColor = document.getElementById('color-choice').value;
     const winningColor = getWinningColor();
@@ -129,9 +138,11 @@ function playRoulette() {
                 alert(`You lost! The ball landed on ${winningColor}.`);
             }
             sectors.forEach(sector => sector.classList.remove('winner'));
+            playButton.disabled = false;
         }, spinTime);
     } else {
         alert('Not enough balance to play!');
+        playButton.disabled = false;
     }
 }
 
