@@ -266,22 +266,43 @@
         };
 
         applyPromo.onclick = function () {
-            const promoCode = document.getElementById('promo-code').value;
+    const promoCode = document.getElementById('promo-code').value;
 
-            if (promoCode === 'SKIBIDI20') {
-                if (isValid == true) {
-                    const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
-                    const newBalance = currentBalance + 20;
-                    localStorage.setItem('balance', newBalance.toFixed(2));
-                    alert('Promo code applied! Your balance has been increased by 20.00.');
-                    updateBalanceDisplay();
-                    promoModal.style.display = 'none';
-                    isValid = false;
-                }
-            } else {
-                alert('Invalid promo code!');
-            }
-        };
+    if (promoCode === 'SKIBIDI20') {
+        if (isValid == true) {
+        const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
+        const newBalance = currentBalance + 20;
+        localStorage.setItem('balance', newBalance.toFixed(2));
+        alert('Promo code applied! Your balance has been increased by 20.00.');
+        updateBalanceDisplay();
+        promoModal.style.display = 'none';
+        isValid = false;
+        }
+    } 
+    else if (promoCode === 'MILIARDER') {
+        if (isValid == true) {
+            // Reset balansu, kosztu upgrade i wartości kliknięcia
+            const newBalance = 0;
+            clickValue = 0.01;
+            upgradeCost = 10.00;
+
+            // Zapisanie nowych wartości w localStorage
+            localStorage.setItem('balance', newBalance.toFixed(2));
+            localStorage.setItem('clickValue', clickValue.toFixed(2));
+            localStorage.setItem('upgradeCost', upgradeCost.toFixed(2));
+
+            // Aktualizacja wyświetlacza balansu oraz przycisku ulepszenia
+            alert('Promo code applied! Your balance is reset and click value is set to 0.01.');
+            updateBalanceDisplay();
+            document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
+
+            promoModal.style.display = 'none';
+            isValid = false;
+        }
+    }else {
+        alert('Invalid promo code!');
+    }
+};
 </script>
 </body>
 </html>

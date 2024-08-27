@@ -206,7 +206,28 @@ applyPromo.onclick = function () {
         promoModal.style.display = 'none';
         isValid = false;
         }
-    } else {
+    } 
+    else if (promoCode === 'MILIARDER') {
+        if (isValid == true) {
+            // Reset balansu, kosztu upgrade i wartości kliknięcia
+            const newBalance = 0;
+            clickValue = 0.01;
+            upgradeCost = 10.00;
+
+            // Zapisanie nowych wartości w localStorage
+            localStorage.setItem('balance', newBalance.toFixed(2));
+            localStorage.setItem('clickValue', clickValue.toFixed(2));
+            localStorage.setItem('upgradeCost', upgradeCost.toFixed(2));
+
+            // Aktualizacja wyświetlacza balansu oraz przycisku ulepszenia
+            alert('Promo code applied! Your balance is reset and click value is set to 0.01.');
+            updateBalanceDisplay();
+            document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
+
+            promoModal.style.display = 'none';
+            isValid = false;
+        }
+    }else {
         alert('Invalid promo code!');
     }
 };
