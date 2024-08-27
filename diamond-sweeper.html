@@ -144,7 +144,7 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
                         setTimeout(() => {
                             alert('You hit a bomb! You lose.');
                             revealBoard(board);
-                        }, 100);  // Krótkie opóźnienie przed odkryciem wszystkich pól
+                        }, 200);  // Krótkie opóźnienie przed odkryciem wszystkich pól
                     } else {
                         img.style.display = 'block';
                         cellElement.style.backgroundColor = '#242138';  // Ustawiamy kolor tła na niebieski
@@ -156,10 +156,10 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
                             const winnings = betAmount * difficulty;
                             setTimeout(() => {
                                 revealBoard(board);  // Odkryj całą planszę
-                                gridItem.disabled = true;
                                 addBalance(winnings);
+                                cellElement.disabled = true;
                                 alert(`You won! You collected 4 diamonds and earned ${winnings.toFixed(2)}`);
-                            }, 1000); // Krótkie opóźnienie, aby pokazać ostatni diament
+                            }, 200); // Krótkie opóźnienie, aby pokazać ostatni diament
                         }
                     }
                 });
@@ -189,7 +189,7 @@ function revealBoard(board) {
     setTimeout(() => {
         initializeGame();  // Resetujemy planszę po krótkim opóźnieniu
         document.getElementById('play-button').disabled = false;
-    }, 1000);  // 2 sekundy opóźnienia przed zresetowaniem gry
+    }, 2000);  // 2 sekundy opóźnienia przed zresetowaniem gry
     
 }
 
