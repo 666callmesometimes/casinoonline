@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <script src="balance.js"></script>
-    <title>Cookie Clicker</title>
+    <title>Crash</title>
     <link rel="shortcut icon" href="img/icon.png" type="image/x-icon">
 </head>
 <body>
@@ -23,8 +23,8 @@
             <a href="#">Help</a>
             <a href="roulette.html">Roulette</a>
             <a href="diamond-sweeper.html">Diamond Sweeper</a>
-            <a href="cookie-clicker.html" class="link-active">Cookie Clicker</a>
-            <a href="crash.html">Crash</a>
+            <a href="cookie-clicker.html">Cookie Clicker</a>
+            <a href="crash.html" class="link-active">Crash</a>
             </div>
         <div class="nav-profile">
             <div class="username" id="display-username">Username</div>
@@ -48,13 +48,16 @@
 </nav>
 
 <div class="game-container">
-    <h1>Cookie Clicker</h1>
-    <div class="cookie-container">
-        <div class="cookie-background">
-        <img src="img/cookie.png" alt="I'm a cookie! Click me!" id="cookie-button">
-        </div>
+    <h1>Crash Game</h1>
+    <div id="crash-history">Crash History: </div>
+    <div class="crash-controls">
+        <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
+        <input type="number" id="auto-cashout" placeholder="Auto Cashout (e.g., 2.0)">
+        <button id="start-button">Start</button><br>
     </div>
-    <button id="upgrade-button">Upgrade Click (Cost: 10.00)</button>
+    <button id="cashout-button" disabled>Cash Out</button>
+    <canvas id="crash-chart" width="600" height="400"></canvas>
+    <div id="result-message"></div>
 </div>
 
 <div id="settings-modal" class="modal">
@@ -79,14 +82,154 @@
     </div>
 </div>
     <script>  
-    let clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
-    let upgradeCost = parseFloat(localStorage.getItem('upgradeCost')) || 10.00;
+    document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('crash-chart');
+    const ctx = canvas.getContext('2d');
+    const betAmountInput = document.getElementById('bet-amount');
+    const autoCashoutInput = document.getElementById('auto-cashout');
+    const startButton = document.getElementById('start-button');
+    const cashoutButton = document.getElementById('cashout-button');
+    const resultMessage = document.getElementById('result-message');
+    const crashHistoryDisplay = document.getElementById('crash-history');
+
+    let isPlaying = false;
+    let multiplier = 1.0;
+    let cashoutMultiplier = null;
+    let gameInterval;
+
+    // Wyświetlanie i aktualizacja balansu
+    function getBalance() {
+        return parseFloat(localStorage.getItem('balance')) || 0;
+    }
+
+    function setBalance(newBalance) {
+        localStorage.setItem('balance', newBalance.toFixed(2));
+        updateBalanceDisplay();
+    }
+
+    function updateBalanceDisplay() {
+        const balanceDisplay = document.getElementById('balance-display');
+        if (balanceDisplay) {
+            balanceDisplay.textContent = `${getBalance().toFixed(2)}`;
+        }
+    }
+
+    function updateCrashHistory(newCrash) {
+        const crashHistory = JSON.parse(localStorage.getItem('crashHistory')) || [];
+        crashHistory.unshift(newCrash);
+
+        if (crashHistory.length > 5) {
+            crashHistory.pop();
+        }
+
+        localStorage.setItem('crashHistory', JSON.stringify(crashHistory));
+        displayCrashHistory();
+    }
+
+    function displayCrashHistory() {
+        const crashHistory = JSON.parse(localStorage.getItem('crashHistory')) || [];
+        crashHistoryDisplay.innerHTML = '' + crashHistory.map(crash => `<span style="color: ${crash >= 2 ? 'green' : '#fafafa'};">${crash}x</span>`).join(' - ');
+    }
+
+    startButton.addEventListener('click', startGame);
+    cashoutButton.addEventListener('click', cashOut);
+
+    function startGame() {
+        if (isPlaying) return;
+
+        const betAmount = parseFloat(betAmountInput.value);
+        const autoCashout = parseFloat(autoCashoutInput.value);
+        const currentBalance = getBalance();
+
+        if (isNaN(betAmount) || betAmount <= 0) {
+            alert("Please enter a valid bet amount.");
+            return;
+        }
+
+        if (betAmount > currentBalance) {
+            alert("Insufficient balance!");
+            return;
+        }
+
+        setBalance(currentBalance - betAmount);
+
+        isPlaying = true;
+        cashoutMultiplier = null;
+        resultMessage.innerHTML = "";
+        multiplier = 1.0;
+        startButton.disabled = true;
+        cashoutButton.disabled = false;
+
+        if (!isNaN(autoCashout) && autoCashout > 0) {
+            cashoutMultiplier = autoCashout;
+        }
+
+        gameInterval = setInterval(updateGame, 100); // Aktualizuj co 100 ms
+    }
+
+    function updateGame() {
+        const crashPoint = Math.random() * 2 + 1.5; // losowy crash point od 1.5 do 3.5
+        multiplier += 0.01; // zwiększaj mnożnik o 0.01 na każdej iteracji
+
+        // Rysowanie wykresu
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height);
+        ctx.lineTo(canvas.width * (multiplier / 10), canvas.height - (canvas.height * multiplier / 10));
+        ctx.strokeStyle = "lime";
+        ctx.stroke();
+
+        // Wyświetlanie bieżącego mnożnika na środku
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText(multiplier.toFixed(2) + "x", canvas.width / 2, canvas.height / 2);
+
+        // Sprawdzenie, czy gra powinna się zakończyć
+        if (multiplier >= crashPoint || (cashoutMultiplier && multiplier >= cashoutMultiplier)) {
+            clearInterval(gameInterval);
+            if (cashoutMultiplier && multiplier >= cashoutMultiplier) {
+                endGame(true);
+            } else {
+                endGame(false);
+            }
+            updateCrashHistory(multiplier.toFixed(2));
+        }
+    }
+
+    function cashOut() {
+        if (!isPlaying) return;
+        clearInterval(gameInterval);
+        endGame(true);
+        updateCrashHistory(multiplier.toFixed(2));
+    }
+
+    function endGame(didWin) {
+        isPlaying = false;
+        startButton.disabled = false;
+        cashoutButton.disabled = true;
+
+        const betAmount = parseFloat(betAmountInput.value);
+
+        if (didWin) {
+            const winnings = betAmount * multiplier;
+            const newBalance = getBalance() + winnings;
+            setBalance(newBalance);
+            resultMessage.innerHTML = `You cashed out at ${multiplier.toFixed(2)}x and won <img src="img/coin.png" id="crash-coin" alt="coin" style="width: 16px;"> ${winnings.toFixed(2)}!`;
+        } else {
+            resultMessage.textContent = `The game crashed at ${multiplier.toFixed(2)}x. You lost!`;
+        }
+    }
+
+    // Inicjalizacja wyświetlania balansu na stronie i historii crashy
+    updateBalanceDisplay();
+    displayCrashHistory();
+});
+
 
         // Inicjalizacja stanu gry po załadowaniu strony
         window.onload = function() {
             updateBalanceDisplay();
-            document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
-            
 
             // Ładowanie ustawień użytkownika
             const savedUsername = localStorage.getItem('username');
@@ -100,28 +243,6 @@
                 document.getElementById('profile-picture').src = savedProfilePic;
             }
         };
-        document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
-        // Obsługa kliknięcia w przycisk ciasteczka
-        document.getElementById('cookie-button').addEventListener('click', () => {
-            addBalance(clickValue);
-        });
-
-        // Obsługa kliknięcia w przycisk ulepszenia
-        document.getElementById('upgrade-button').addEventListener('click', () => {
-            if (getBalance() >= upgradeCost) {
-                subtractBalance(upgradeCost);
-                clickValue *= 2;
-                upgradeCost *= 3;
-
-                // Zapisanie nowych wartości w localStorage
-                localStorage.setItem('clickValue', clickValue.toFixed(2));
-                localStorage.setItem('upgradeCost', upgradeCost.toFixed(2));
-
-                document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
-            } else {
-                alert('Not enough balance to upgrade!');
-            }
-        });
 
         //OBSŁUGA MENU
 

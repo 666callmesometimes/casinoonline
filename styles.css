@@ -375,6 +375,61 @@ h2 {
 }
 
 
+/*CRASH*/
+canvas {
+  background-color: #232229;
+  border: 2px solid #504f55;
+  margin-top: 20px;
+}
+
+#result-message {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+.crash-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
+}
+#cashout-button {
+  width: 20%;
+  padding: 1rem;
+  min-width: 18rem;
+}
+#start-button {
+  background-color: #0E0E10;
+  width: 100%;
+}
+
+
+
+/*PLINKO*/
+canvas {
+  border: 2px solid white;
+  margin: 20px auto;
+  display: block;
+  background-color: #444;
+}
+
+input, button {
+  margin: 10px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+#result-message img {
+  width: 20px;
+  vertical-align: middle;
+}
+
+
 
 
 /*MODALS*/
@@ -505,6 +560,12 @@ h2 {
   .history-item.green {
     color: #359F59;
     width: 24px;
+  }
+  canvas {
+    background-color: #222;
+    border: 2px solid #555;
+    margin-top: 20px;
+    width: 90%;
   }
 }
 
