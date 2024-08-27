@@ -52,7 +52,7 @@
     <div id="history-container"><span id="history"></span></div><br>
     <span class="controls">
         <br>
-    <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
+    <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01" min="0.01">
     <button id="max-bet-button">Max</button>
     <select id="color-choice">
         <option value="red">Red</option>
@@ -117,7 +117,7 @@
             const spinTime = 3000; // Czas kręcenia ruletki
             let winnerIndex;
 
-            if (getBalance() >= betAmount) {
+            if (getBalance() >= betAmount && betAmount > 0) {
                 subtractBalance(betAmount);
 
                 // Wyznaczenie wygrywającego koloru
@@ -133,9 +133,9 @@
                 board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
 
                 if (winningColor === 'green') {
-                                    board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17 }deg)`;
-                                }
-                
+                    board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17 }deg)`;
+                }
+
                 setTimeout(() => {
                     board.style.transition = '';
                     board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
@@ -160,7 +160,7 @@
         }
 
         function getWinningColor() {
-            const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
+            const colors = ['red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
             const randomIndex = Math.floor(Math.random() * colors.length);
             return colors[randomIndex];
         }
