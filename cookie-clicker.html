@@ -82,6 +82,8 @@
     let clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
     let upgradeCost = parseFloat(localStorage.getItem('upgradeCost')) || 10.00;
 
+    let isClickable = true;
+
         // Inicjalizacja stanu gry po załadowaniu strony
         window.onload = function() {
             updateBalanceDisplay();
@@ -101,10 +103,18 @@
             }
         };
         document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
+        
         // Obsługa kliknięcia w przycisk ciasteczka
         document.getElementById('cookie-button').addEventListener('click', () => {
+        if (isClickable) {
             addBalance(clickValue);
-        });
+            isClickable = false;
+            setTimeout(() => {
+                isClickable = true;
+            }, 80);
+        }
+    });
+        
 
         // Obsługa kliknięcia w przycisk ulepszenia
         document.getElementById('upgrade-button').addEventListener('click', () => {
