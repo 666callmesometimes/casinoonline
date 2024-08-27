@@ -47,8 +47,11 @@
 
 <div class="game-container">
     <h1>Roulette</h1>
-    <span>
+    <div id="history-container"><span id="history"></span></div><br>
+    <span class="controls">
+        <br>
     <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
+    <button id="max-bet-button">Max</button>
     <select id="color-choice">
         <option value="red">Red</option>
         <option value="black">Black</option>
@@ -56,6 +59,7 @@
     </select>
 </span><br>
     <button id="play-button">Play</button><br>
+    V
     <div id="roulette-board"></div>
 </div>
 
@@ -80,165 +84,198 @@
         <button id="apply-promo">Apply</button>
     </div>
 </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-    createRouletteBoard();
-    document.getElementById('play-button').addEventListener('click', playRoulette);
-});
-
-function createRouletteBoard() {
-    const board = document.getElementById('roulette-board');
-    const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
-
-    colors.forEach((color, index) => {
-        const slot = document.createElement('div');
-        slot.classList.add('roulette-slot', color);
-        slot.style.transform = `rotate(${index * (360 / colors.length)}deg)`;
-        board.appendChild(slot);
-    });
-}
-
-function playRoulette() {
-
-    const playButton = document.getElementById('play-button');
-    playButton.disabled = true;
-
-    const betAmount = parseFloat(document.getElementById('bet-amount').value);
-    const chosenColor = document.getElementById('color-choice').value;
-    const winningColor = getWinningColor();
-    const sectors = document.querySelectorAll('#roulette-board .roulette-slot');
-    const spinTime = 3000; // Czas kręcenia ruletki
-    let winnerIndex;
-
-    if (getBalance() >= betAmount) {
-        subtractBalance(betAmount);
-
-        // Wyznaczenie wygrywającego koloru
-        sectors.forEach((sector, index) => {
-            if (sector.classList.contains(winningColor)) {
-                winnerIndex = index;
-            }
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+            createRouletteBoard();
+            loadHistory();  // Ładowanie historii przy załadowaniu strony
+            document.getElementById('play-button').addEventListener('click', playRoulette);
+            document.getElementById('max-bet-button').addEventListener('click', setMaxBet); // Event listener dla przycisku Max
         });
 
-        // Kręcenie ruletką
-        const board = document.getElementById('roulette-board');
-        board.style.transition = `transform ${spinTime}ms ease-out`;
-        board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
+        function createRouletteBoard() {
+            const board = document.getElementById('roulette-board');
+            const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
 
-        setTimeout(() => {
-            board.style.transition = '';
-            board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
-            sectors[winnerIndex].classList.add('winner');
-            
-            if (winningColor === chosenColor) {
-                const winnings = betAmount * (winningColor === 'green' ? 14 : 2);
-                addBalance(winnings);
-                alert(`You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`);
-            } else {
-                alert(`You lost! The ball landed on ${winningColor}.`);
-            }
-            sectors.forEach(sector => sector.classList.remove('winner'));
-            playButton.disabled = false;
-        }, spinTime);
-    } else {
-        alert('Not enough balance to play!');
-        playButton.disabled = false;
-    }
-}
-
-function getWinningColor() {
-    const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-}
-
-//OBSŁUGA MENU
-
-const menuBtn = document.getElementById("hamburger");
-    const menu = document.getElementById("menu");
-
-    menuBtn.addEventListener('click', function(){
-        menu.classList.toggle("menu-open");
-    });
-
-     //MODAL
-const settingsModal = document.getElementById('settings-modal');
-const settingsBtn = document.getElementById('settings');
-const settingsClose = document.getElementById('settings-close');
-const saveSettings = document.getElementById('save-settings');
-
-settingsBtn.onclick = function () {
-    settingsModal.style.display = 'block';
-};
-
-settingsClose.onclick = function () {
-    settingsModal.style.display = 'none';
-};
-
-saveSettings.onclick = function () {
-    const username = document.getElementById('username').value;
-    const profilePic = document.getElementById('profile-pic').value;
-
-    if (username) {
-        localStorage.setItem('username', username);
-        document.getElementById('display-username').textContent = username;
-    }
-
-    if (profilePic) {
-        localStorage.setItem('profilePic', profilePic);
-        document.getElementById('profile-picture').src = profilePic;
-    }
-
-    settingsModal.style.display = 'none';
-};
-
-// Ładowanie ustawień z localStorage
-window.onload = function () {
-    const savedUsername = localStorage.getItem('username');
-    const savedProfilePic = localStorage.getItem('profilePic');
-
-    if (savedUsername) {
-        document.getElementById('display-username').textContent = savedUsername;
-    }
-
-    if (savedProfilePic) {
-        document.getElementById('profile-picture').src = savedProfilePic;
-    }
-};
-
-
-// Promo Modal
-const promoModal = document.getElementById('promo-modal');
-const promoBtn = document.getElementById('promo');
-const promoClose = document.getElementById('promo-close');
-const applyPromo = document.getElementById('apply-promo');
-let isValid = true;
-
-promoBtn.onclick = function () {
-    promoModal.style.display = 'block';
-};
-
-promoClose.onclick = function () {
-    promoModal.style.display = 'none';
-};
-
-applyPromo.onclick = function () {
-    const promoCode = document.getElementById('promo-code').value;
-
-    if (promoCode === 'SKIBIDI20') {
-        if (isValid == true) {
-        const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
-        const newBalance = currentBalance + 20;
-        localStorage.setItem('balance', newBalance.toFixed(2));
-        alert('Promo code applied! Your balance has been increased by 20.00.');
-        updateBalanceDisplay();
-        promoModal.style.display = 'none';
-        isValid = false;
+            colors.forEach((color, index) => {
+                const slot = document.createElement('div');
+                slot.classList.add('roulette-slot', color);
+                slot.style.transform = `rotate(${index * (360 / colors.length)}deg)`;
+                board.appendChild(slot);
+            });
         }
-    } else {
-        alert('Invalid promo code!');
-    }
-};
-    </script>
+
+        function playRoulette() {
+            const playButton = document.getElementById('play-button');
+            playButton.disabled = true;
+
+            const betAmount = parseFloat(document.getElementById('bet-amount').value);
+            const chosenColor = document.getElementById('color-choice').value;
+            const winningColor = getWinningColor();
+            const sectors = document.querySelectorAll('#roulette-board .roulette-slot');
+            const spinTime = 3000; // Czas kręcenia ruletki
+            let winnerIndex;
+
+            if (getBalance() >= betAmount) {
+                subtractBalance(betAmount);
+
+                // Wyznaczenie wygrywającego koloru
+                sectors.forEach((sector, index) => {
+                    if (sector.classList.contains(winningColor)) {
+                        winnerIndex = index;
+                    }
+                });
+
+                // Kręcenie ruletką
+                const board = document.getElementById('roulette-board');
+                board.style.transition = `transform ${spinTime}ms ease-out`;
+                board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
+
+                setTimeout(() => {
+                    board.style.transition = '';
+                    board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
+                    sectors[winnerIndex].classList.add('winner');
+                    
+                    if (winningColor === chosenColor) {
+                        const winnings = betAmount * (winningColor === 'green' ? 14 : 2);
+                        addBalance(winnings);
+                        alert(`You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`);
+                    } else {
+                        alert(`You lost! The ball landed on ${winningColor}.`);
+                    }
+
+                    updateHistory(winningColor); // Aktualizacja historii
+                    sectors.forEach(sector => sector.classList.remove('winner'));
+                    playButton.disabled = false;
+                }, spinTime);
+            } else {
+                alert('Not enough balance to play!');
+                playButton.disabled = false;
+            }
+        }
+
+        function getWinningColor() {
+            const colors = ['red', 'black', 'black', 'red', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            return colors[randomIndex];
+        }
+
+        function updateHistory(winningColor) {
+            let history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
+            history.push(winningColor);
+            if (history.length > 10) {
+                history.shift(); // Zachowaj tylko ostatnie 10 wyników
+            }
+            localStorage.setItem('rouletteHistory', JSON.stringify(history));
+            displayHistory(history);
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
+            displayHistory(history);
+        }
+
+        function displayHistory(history) {
+            const historyContainer = document.getElementById('history');
+            historyContainer.innerHTML = ''; // Czyścimy wcześniejszą zawartość
+
+            history.forEach(color => {
+                const span = document.createElement('span');
+                span.classList.add('history-item', color);
+                span.textContent = color.charAt(0).toUpperCase() + color.slice(1); // Pierwsza litera wielka
+                historyContainer.appendChild(span);
+            });
+        }
+
+        function setMaxBet() {
+            const balance = getBalance();
+            document.getElementById('bet-amount').value = balance.toFixed(2); // Ustawienie wartości w polu zakładu
+        }
+
+        // OBSŁUGA MENU
+        const menuBtn = document.getElementById("hamburger");
+        const menu = document.getElementById("menu");
+
+        menuBtn.addEventListener('click', function(){
+            menu.classList.toggle("menu-open");
+        });
+
+        // MODAL
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsBtn = document.getElementById('settings');
+        const settingsClose = document.getElementById('settings-close');
+        const saveSettings = document.getElementById('save-settings');
+
+        settingsBtn.onclick = function () {
+            settingsModal.style.display = 'block';
+        };
+
+        settingsClose.onclick = function () {
+            settingsModal.style.display = 'none';
+        };
+
+        saveSettings.onclick = function () {
+            const username = document.getElementById('username').value;
+            const profilePic = document.getElementById('profile-pic').value;
+
+            if (username) {
+                localStorage.setItem('username', username);
+                document.getElementById('display-username').textContent = username;
+            }
+
+            if (profilePic) {
+                localStorage.setItem('profilePic', profilePic);
+                document.getElementById('profile-picture').src = profilePic;
+            }
+
+            settingsModal.style.display = 'none';
+        };
+
+        // Ładowanie ustawień z localStorage
+        window.onload = function () {
+            const savedUsername = localStorage.getItem('username');
+            const savedProfilePic = localStorage.getItem('profilePic');
+
+            if (savedUsername) {
+                document.getElementById('display-username').textContent = savedUsername;
+            }
+
+            if (savedProfilePic) {
+                document.getElementById('profile-picture').src = savedProfilePic;
+            }
+        };
+
+        // Promo Modal
+        const promoModal = document.getElementById('promo-modal');
+        const promoBtn = document.getElementById('promo');
+        const promoClose = document.getElementById('promo-close');
+        const applyPromo = document.getElementById('apply-promo');
+        let isValid = true;
+
+        promoBtn.onclick = function () {
+            promoModal.style.display = 'block';
+        };
+
+        promoClose.onclick = function () {
+            promoModal.style.display = 'none';
+        };
+
+        applyPromo.onclick = function () {
+            const promoCode = document.getElementById('promo-code').value;
+
+            if (promoCode === 'SKIBIDI20') {
+                if (isValid == true) {
+                    const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
+                    const newBalance = currentBalance + 20;
+                    localStorage.setItem('balance', newBalance.toFixed(2));
+                    alert('Promo code applied! Your balance has been increased by 20.00.');
+                    updateBalanceDisplay();
+                    promoModal.style.display = 'none';
+                    isValid = false;
+                }
+            } else {
+                alert('Invalid promo code!');
+            }
+        };
+</script>
 </body>
 </html>
