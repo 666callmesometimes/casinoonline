@@ -132,6 +132,10 @@
                 board.style.transition = `transform ${spinTime}ms ease-out`;
                 board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
 
+                if (winningColor === 'green') {
+                                    board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17 }deg)`;
+                                }
+                
                 setTimeout(() => {
                     board.style.transition = '';
                     board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
