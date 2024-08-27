@@ -87,7 +87,7 @@
     </div>
 </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+       document.addEventListener('DOMContentLoaded', () => {
     initializeGame();  // Inicjalizujemy planszę od razu po załadowaniu strony
 });
 
@@ -141,6 +141,7 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
                     if (cell === 'bomb') {
                         img.style.display = 'block';
                         cellElement.style.backgroundColor = '#411B1E';  // Ustawiamy kolor tła na czerwony
+                        disableAllCells();  // Blokujemy pola po przegranej
                         setTimeout(() => {
                             alert('You hit a bomb! You lose.');
                             revealBoard(board);
@@ -153,11 +154,11 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
                         cellElement.style.pointerEvents = 'none'; // Zablokuj ponowne klikanie tego samego pola
 
                         if (diamondsCollected >= 4) {
+                            disableAllCells()
                             const winnings = betAmount * difficulty;
                             setTimeout(() => {
                                 revealBoard(board);  // Odkryj całą planszę
                                 addBalance(winnings);
-                                cellElement.disabled = true;
                                 alert(`You won! You collected 4 diamonds and earned ${winnings.toFixed(2)}`);
                             }, 200); // Krótkie opóźnienie, aby pokazać ostatni diament
                         }
@@ -167,6 +168,13 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
 
             gameBoard.appendChild(cellElement);
         });
+    });
+}
+
+function disableAllCells() {
+    const cells = document.querySelectorAll('.grid-item');
+    cells.forEach(cell => {
+        cell.style.pointerEvents = 'none';  // Wyłącz wszystkie kliknięcia
     });
 }
 
@@ -231,6 +239,7 @@ function getBombsCount(difficulty) {
             return 10;
     }
 }
+
 
 
 //OBSŁUGA MENU
