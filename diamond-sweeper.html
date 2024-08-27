@@ -61,7 +61,7 @@
     <br>
     <button id="play-button">Play</button>
     <br>
-    <div id="remaining-diamonds">Pozostały Ci 4 diamenty</div>
+    <div id="remaining-diamonds">Pozostało Ci 5 diamentów</div>
     <div id="game-board" class="grid-container"></div>
 </div>
 
@@ -123,7 +123,7 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
     const gameBoard = document.getElementById('game-board');
     gameBoard.innerHTML = '';  // Czyścimy poprzednią planszę
 
-    updateRemainingDiamonds(4);  // Ustawiamy licznik diamentów na 4
+    updateRemainingDiamonds(5);  // Ustawiamy licznik diamentów na 5
 
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
@@ -150,16 +150,16 @@ function renderBoard(board, isInteractive, betAmount, difficulty) {
                         img.style.display = 'block';
                         cellElement.style.backgroundColor = '#242138';  // Ustawiamy kolor tła na niebieski
                         diamondsCollected++;
-                        updateRemainingDiamonds(4 - diamondsCollected);
+                        updateRemainingDiamonds(5 - diamondsCollected);
                         cellElement.style.pointerEvents = 'none'; // Zablokuj ponowne klikanie tego samego pola
 
-                        if (diamondsCollected >= 4) {
+                        if (diamondsCollected >= 5) {
                             disableAllCells()
                             const winnings = betAmount * difficulty;
                             setTimeout(() => {
                                 revealBoard(board);  // Odkryj całą planszę
                                 addBalance(winnings);
-                                alert(`You won! You collected 4 diamonds and earned ${winnings.toFixed(2)}`);
+                                alert(`You won! You collected 5 diamonds and earned ${winnings.toFixed(2)}`);
                             }, 200); // Krótkie opóźnienie, aby pokazać ostatni diament
                         }
                     }
