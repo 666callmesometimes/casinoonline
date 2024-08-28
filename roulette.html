@@ -51,14 +51,30 @@
     <h1>Roulette</h1>
     <div id="history-container"><span id="history"></span></div><br>
     <span class="controls">
-        <br>
-    <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01" min="0.01">
-    <button id="max-bet-button">Max</button>
-    <select id="color-choice">
+    <br>
+    <div class="bet-values">
+        <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01" min="0.01">
+        <button class="crash-button" id="clear-bet-button">Clear</button>
+        <button id="max-bet-button">Max</button>
+    </div>
+    <div class="bet-options">
+        <button class="crash-button" id="half-bet-button">/2</button>
+        <button class="crash-button" id="plus100">+100</button>
+        <button class="crash-button" id="plus1000">+1000</button>
+        <button class="crash-button" id="minus100">-100</button>
+        <button class="crash-button" id="minus1000">-1000</button>
+        <label for="turbo-button" id="turbo-button-label">Turbo</label><input type="checkbox" name="turbo" id="turbo-button">
+    </div>
+    <!-- <select id="color-choice">
         <option value="red">Red</option>
         <option value="black">Black</option>
         <option value="green">Green</option>
-    </select>
+    </select> -->
+    <div class="bet-choice">
+        <button id="red">Red (2x)</button>
+        <button id="black">Black (2x)</button>
+        <button id="green">Green (14x)</button>
+    </div>
 </span><br>
     <button id="play-button">Play</button><br>
     V
@@ -91,8 +107,42 @@
             createRouletteBoard();
             loadHistory();  // Ładowanie historii przy załadowaniu strony
             document.getElementById('play-button').addEventListener('click', playRoulette);
-            document.getElementById('max-bet-button').addEventListener('click', setMaxBet); // Event listener dla przycisku Max
+            document.getElementById('max-bet-button').addEventListener('click', setMaxBet);
+            document.getElementById('half-bet-button').addEventListener('click', setHalfBet);
+            document.getElementById('plus100').addEventListener('click', plus100);
+            document.getElementById('plus1000').addEventListener('click', plus1000);
+            document.getElementById('minus100').addEventListener('click', minus100);
+            document.getElementById('minus1000').addEventListener('click', minus1000);
+            document.getElementById('clear-bet-button').addEventListener('click', clearBet);
+            document.getElementById('turbo-button').addEventListener('click', turbo);
+        
+            // Obsługa kliknięcia na przyciski wyboru koloru
+            document.getElementById('red').addEventListener('click', () => selectColor('red'));
+            document.getElementById('black').addEventListener('click', () => selectColor('black'));
+            document.getElementById('green').addEventListener('click', () => selectColor('green'));
+
         });
+        var spinTime = 3000; // Czas kręcenia ruletki
+        let chosenColor = null; // Przechowuje wybrany kolor
+
+        function selectColor(color) {
+    // Zresetowanie stylów dla wszystkich przycisków
+    const colorButtons = document.querySelectorAll('.bet-choice button');
+    colorButtons.forEach(button => {
+        button.classList.remove('selected', 'disabled'); // Aktywuje wszystkie przyciski
+    });
+
+    // Ustawienie wybranego koloru i dodanie klasy 'selected' do odpowiedniego przycisku
+    chosenColor = color;
+    document.getElementById(color).classList.add('selected');
+
+    // Wyszarzenie pozostałych przycisków i dezaktywacja
+    colorButtons.forEach(button => {
+        if (button.id !== color) {
+            button.classList.add('disabled'); // Dezaktywacja pozostałych przycisków
+        }
+    });
+}
 
         function createRouletteBoard() {
             const board = document.getElementById('roulette-board');
@@ -107,63 +157,74 @@
         }
 
         function playRoulette() {
-            const playButton = document.getElementById('play-button');
-            playButton.disabled = true;
+    const playButton = document.getElementById('play-button');
+    playButton.disabled = true;
 
-            const betAmount = parseFloat(document.getElementById('bet-amount').value);
-            const chosenColor = document.getElementById('color-choice').value;
-            const winningColor = getWinningColor();
-            const sectors = document.querySelectorAll('#roulette-board .roulette-slot');
-            const spinTime = 3000; // Czas kręcenia ruletki
-            let winnerIndex;
+    const betAmount = parseFloat(document.getElementById('bet-amount').value);
+    const winningColor = getWinningColor();
+    const sectors = document.querySelectorAll('#roulette-board .roulette-slot');
+    let winnerIndex;
 
-            if (getBalance() >= betAmount && betAmount > 0) {
-                subtractBalance(betAmount);
+    if (!chosenColor) {
+        alert('Please select a color before playing!');
+        playButton.disabled = false;
+        return;
+    }
 
-                // Wyznaczenie wygrywającego koloru
-                sectors.forEach((sector, index) => {
-                    if (sector.classList.contains(winningColor)) {
-                        winnerIndex = index;
-                    }
-                });
+    if (getBalance() >= betAmount && betAmount > 0) {
+        subtractBalance(betAmount);
 
-                // Kręcenie ruletką
-                const board = document.getElementById('roulette-board');
-                board.style.transition = `transform ${spinTime}ms ease-out`;
-                board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
-
-                if (winningColor === 'green') {
-                    board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17 }deg)`;
-                }
-
-                setTimeout(() => {
-                    board.style.transition = '';
-                    board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
-                    sectors[winnerIndex].classList.add('winner');
-                    
-                    if (winningColor === chosenColor) {
-                        const winnings = betAmount * (winningColor === 'green' ? 14 : 2);
-                        addBalance(winnings);
-                        alert(`You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`);
-                    } else {
-                        alert(`You lost! The ball landed on ${winningColor}.`);
-                    }
-
-                    updateHistory(winningColor); // Aktualizacja historii
-                    sectors.forEach(sector => sector.classList.remove('winner'));
-                    playButton.disabled = false;
-                }, spinTime);
-            } else {
-                alert('Not enough balance to play!');
-                playButton.disabled = false;
+        // Wyznaczenie wygrywającego koloru
+        sectors.forEach((sector, index) => {
+            if (sector.classList.contains(winningColor)) {
+                winnerIndex = index;
             }
+        });
+
+        // Kręcenie ruletką
+        const board = document.getElementById('roulette-board');
+        board.style.transition = `transform ${spinTime}ms ease-out`;
+        board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
+
+        if (winningColor === 'green') {
+            board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17}deg)`;
         }
 
-        function getWinningColor() {
-            const colors = ['red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
-            const randomIndex = Math.floor(Math.random() * colors.length);
-            return colors[randomIndex];
-        }
+        setTimeout(() => {
+            board.style.transition = '';
+            board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
+            sectors[winnerIndex].classList.add('winner');
+
+            if (winningColor === chosenColor) {
+                const winnings = betAmount * (winningColor === 'green' ? 14 : 2);
+                addBalance(winnings);
+                alert(`You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`);
+            } else {
+                alert(`You lost! The ball landed on ${winningColor}.`);
+            }
+
+            updateHistory(winningColor); // Aktualizacja historii
+            sectors.forEach(sector => sector.classList.remove('winner'));
+            playButton.disabled = false;
+
+            // Resetowanie przycisków po zakończeniu gry
+            document.querySelectorAll('.bet-choice button').forEach(button => {
+                button.classList.remove('selected', 'disabled');
+                button.disabled = false; // Aktywacja wszystkich przycisków
+            });
+            chosenColor = null; // Resetowanie wybranego koloru
+        }, spinTime);
+    } else {
+        alert('Not enough balance to play!');
+        playButton.disabled = false;
+    }
+}
+
+function getWinningColor() {
+    const colors = ['red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'green'];
+    const randomIndex = Math.floor(Math.random() * colors.length);
+    return colors[randomIndex];
+}
 
         function updateHistory(winningColor) {
             let history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
@@ -192,10 +253,53 @@
             });
         }
 
+        const betAmountInput = document.getElementById('bet-amount');
+
         function setMaxBet() {
             const balance = getBalance();
             document.getElementById('bet-amount').value = balance.toFixed(2); // Ustawienie wartości w polu zakładu
         }
+        function setHalfBet() {
+            const halfBet = (document.getElementById('bet-amount').value) / 2;
+            document.getElementById('bet-amount').value = halfBet.toFixed(2);
+        }
+        function plus100() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet += 100;
+        betAmountInput.value = currentBet.toFixed(2); // Ustawienie nowej wartości zakładu
+        }
+        function plus1000() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet += 1000;
+        betAmountInput.value = currentBet.toFixed(2); // Ustawienie nowej wartości zakładu
+        }
+        function minus100() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet -= 100;
+        betAmountInput.value = currentBet.toFixed(2); // Ustawienie nowej wartości zakładu
+        }
+        function minus1000() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet -= 1000;
+        betAmountInput.value = currentBet.toFixed(2);
+        }
+        function clearBet() {
+            document.getElementById('bet-amount').value = 0.00; // Ustawienie wartości w polu zakładu
+        }
+
+        function turbo() {
+            if (document.getElementById('turbo-button').checked) {
+                spinTime = 300;
+                document.getElementById("turbo-button-label").style.opacity="0.4";
+                document.getElementById("turbo-button-label").style.backgroundColor="green";
+            }
+            else {
+                spinTime = 3000;
+                document.getElementById("turbo-button-label").style.opacity="1";
+                document.getElementById("turbo-button-label").style.backgroundColor="#5B509F";
+            }
+        }
+
 
         // OBSŁUGA MENU
         const menuBtn = document.getElementById("hamburger");

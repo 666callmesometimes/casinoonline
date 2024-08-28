@@ -356,7 +356,8 @@ h2 {
 .history-item.green {
   background-color: #359F59;
 }
-#max-bet-button {
+#max-bet-button,
+#clear-bet-button {
   background-color: #0E0E10;
   box-sizing: border-box;
   padding: 6px;
@@ -370,25 +371,51 @@ h2 {
 }
 .controls {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   flex-wrap: wrap;
+  gap: 8px;
 }
+.bet-values {
+  display: flex;
+  justify-content: center;
+}
+.bet-choice{
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+#red {
+  background-color: #D03838;
+}
+#black {
+  background-color: #101010;
+}
+#green {
+  background-color: #359F59;
+}
+.bet-choice button {
+  padding: 1rem;
+}
+.bet-choice button.disabled {
+  opacity: 0.3;
+}
+
 
 
 /*CRASH*/
 canvas {
-  background-color: #232229;
-  border: 2px solid #504f55;
-  margin-top: 20px;
+  background-color: #222;
+  border: 2px solid #555;
+  margin-top: 1rem;
 }
 
 #result-message {
-  margin-top: 20px;
-  font-size: 18px;
+  margin-top: 1rem;
+  font-size: 1rem;
   font-weight: bold;
   text-align: center;
-  display: flex;
-  align-items: center;
+  min-height: 20px;
 }
 .crash-controls {
   display: flex;
@@ -398,20 +425,47 @@ canvas {
   align-items: center;
   margin: 1rem;
 }
-#cashout-button {
+#cashout-button,
+#start-button,
+#play-button {
   width: 20%;
   padding: 1rem;
   min-width: 18rem;
+  margin: 8px;
 }
 #start-button {
   background-color: #0E0E10;
-  width: 100%;
+  min-width: 18rem;
+}
+#crash-coin {
+  position: relative;
+  bottom: 2px;
+  left: 4px;
+}
+.crash-button {
+  margin: 0;
+}
+.bet-options input[type="checkbox"] {
+  display: none;
+}
+.bet-options label {
+  background-color: #5B509F;
+  cursor: pointer;
+  font-family: 'Lexend', 'Segoe UI', sans-serif;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  color: #fafafa;
+  font-size: 1rem;
 }
 
-
+.crash-controls button,
+.bet-options button {
+  background-color: #101010;
+}
 
 /*PLINKO*/
-canvas {
+/* canvas {
   border: 2px solid white;
   margin: 20px auto;
   display: block;
@@ -427,7 +481,7 @@ input, button {
 #result-message img {
   width: 20px;
   vertical-align: middle;
-}
+} */
 
 
 
@@ -566,6 +620,10 @@ input, button {
     border: 2px solid #555;
     margin-top: 20px;
     width: 90%;
+  }
+  .crash-controls button{
+    font-size: 12px;
+    padding: 8px;
   }
 }
 

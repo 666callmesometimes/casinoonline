@@ -49,15 +49,27 @@
 
 <div class="game-container">
     <h1>Crash Game</h1>
-    <div id="crash-history">Crash History: </div>
-    <div class="crash-controls">
-        <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
-        <input type="number" id="auto-cashout" placeholder="Auto Cashout (e.g., 2.0)">
-        <button id="start-button">Start</button><br>
-    </div>
-    <button id="cashout-button" disabled>Cash Out</button>
-    <canvas id="crash-chart" width="600" height="400"></canvas>
     <div id="result-message"></div>
+    <div class="crash-controls">
+        <div class="bet-ammount">
+            <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01" value="0.00">
+            <button class="crash-button" id="clear-bet-button">Clear</button>
+            <button id="max-bet-button">Max</button>
+        </div>
+        <div class="bet-options">
+            <button class="crash-button" id="half-bet-button">/2</button>
+            <button class="crash-button" id="plus100">+100</button>
+            <button class="crash-button" id="plus1000">+1000</button>
+            <button class="crash-button" id="minus100">-100</button>
+            <button class="crash-button" id="minus1000">-1000</button>
+            <label for="turbo-button" id="turbo-button-label">Turbo</label><input type="checkbox" name="turbo" id="turbo-button">
+        </div>
+        <input type="number" id="auto-cashout" placeholder="Auto Cashout (e.g., 2.0)">
+    </div>
+    <button id="start-button">Start</button>
+    <button id="cashout-button" disabled>Cash Out</button>
+    <div id="crash-history">Crash History: </div>
+    <canvas id="crash-chart" width="600" height="400"></canvas>
 </div>
 
 <div id="settings-modal" class="modal">
@@ -91,6 +103,19 @@
     const cashoutButton = document.getElementById('cashout-button');
     const resultMessage = document.getElementById('result-message');
     const crashHistoryDisplay = document.getElementById('crash-history');
+
+    document.getElementById('max-bet-button').addEventListener('click', setMaxBet);
+    document.getElementById('half-bet-button').addEventListener('click', setHalfBet);
+    document.getElementById('plus100').addEventListener('click', plus100);
+    document.getElementById('plus1000').addEventListener('click', plus1000);
+    document.getElementById('minus100').addEventListener('click', minus100);
+    document.getElementById('minus1000').addEventListener('click', minus1000);
+    document.getElementById('clear-bet-button').addEventListener('click', clearBet);
+    document.getElementById('turbo-button').addEventListener('click', turbo);
+
+    var gameSpeed = 100;
+
+
 
     let isPlaying = false;
     let multiplier = 1.0;
@@ -150,6 +175,11 @@
             alert("Insufficient balance!");
             return;
         }
+        if (!isNaN(autoCashout) && autoCashout < 1.20) {
+            alert("Minimum auto cashout is 1.20x!");
+            autoCashout = 1.20;
+            autoCashoutInput.value = autoCashout.toFixed(2);  // Aktualizacja pola input
+        }
 
         setBalance(currentBalance - betAmount);
 
@@ -163,12 +193,25 @@
         if (!isNaN(autoCashout) && autoCashout > 0) {
             cashoutMultiplier = autoCashout;
         }
-
-        gameInterval = setInterval(updateGame, 100); // Aktualizuj co 100 ms
+        
+        gameInterval = setInterval(updateGame, gameSpeed); // Aktualizuj co 100 ms
     }
 
+    function turbo() {
+            if (document.getElementById('turbo-button').checked) {
+                gameSpeed = 10;
+                document.getElementById("turbo-button-label").style.opacity="0.4";
+                document.getElementById("turbo-button-label").style.backgroundColor="green";
+            }
+            else {
+                gameSpeed = 100;
+                document.getElementById("turbo-button-label").style.opacity="1";
+                document.getElementById("turbo-button-label").style.backgroundColor="#5B509F";
+            }
+        }
+
     function updateGame() {
-        const crashPoint = Math.random() * 2 + 1.01; // losowy crash point od 1.5 do 3.5
+        const crashPoint = Math.random() * 2 + 1.00; // losowy crash point od 1.5 do 3.5
         multiplier += 0.01; // zwiększaj mnożnik o 0.01 na każdej iteracji
 
         // Rysowanie wykresu
@@ -247,6 +290,44 @@
                 document.getElementById('profile-picture').src = savedProfilePic;
             }
         };
+        const betAmountInput = document.getElementById('bet-amount');
+
+        function setMaxBet() {
+            const balance = getBalance();
+            document.getElementById('bet-amount').value = balance.toFixed(2); // Ustawienie wartości w polu zakładu
+        }
+        function setHalfBet() {
+            const halfBet = (document.getElementById('bet-amount').value) / 2;
+            document.getElementById('bet-amount').value = halfBet.toFixed(2);
+        }
+        function plus100() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet += 100;
+        betAmountInput.value = currentBet.toFixed(2); // Ustawienie nowej wartości zakładu
+        }
+        function plus1000() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet += 1000;
+        betAmountInput.value = currentBet.toFixed(2); // Ustawienie nowej wartości zakładu
+        }
+        function minus100() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet -= 100;
+        betAmountInput.value = currentBet.toFixed(2); // Ustawienie nowej wartości zakładu
+        }
+        function minus1000() {
+        let currentBet = parseFloat(betAmountInput.value) || 0;
+        currentBet -= 1000;
+        betAmountInput.value = currentBet.toFixed(2);
+        }
+        function clearBet() {
+            document.getElementById('bet-amount').value = 0.00; // Ustawienie wartości w polu zakładu
+        }
+
+
+
+
+
 
         //OBSŁUGA MENU
 

@@ -51,6 +51,8 @@
     <h1>Diamond Sweeper</h1>
     <span>
         <input type="number" id="bet-amount" placeholder="Bet Amount" step="0.01">
+        <button class="crash-button" id="clear-bet-button">Clear</button>
+        <button id="max-bet-button">Max</button>
         <select id="difficulty">
             <option value="1.5">1.5x</option>
             <option value="2">2x</option>
@@ -90,7 +92,8 @@
        document.addEventListener('DOMContentLoaded', () => {
     initializeGame();  // Inicjalizujemy planszę od razu po załadowaniu strony
 });
-
+document.getElementById('clear-bet-button').addEventListener('click', clearBet);
+document.getElementById('max-bet-button').addEventListener('click', setMaxBet);
 document.getElementById('play-button').addEventListener('click', () => {
 
     document.getElementById('play-button').disabled = true;
@@ -240,7 +243,15 @@ function getBombsCount(difficulty) {
     }
 }
 
+const betAmountInput = document.getElementById('bet-amount');
 
+function setMaxBet() {
+    const balance = getBalance();
+    document.getElementById('bet-amount').value = balance.toFixed(2); // Ustawienie wartości w polu zakładu
+}
+function clearBet() {
+            document.getElementById('bet-amount').value = 0.00; // Ustawienie wartości w polu zakładu
+}
 
 //OBSŁUGA MENU
 
