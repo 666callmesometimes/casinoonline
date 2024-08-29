@@ -625,6 +625,16 @@ input, button {
     font-size: 12px;
     padding: 8px;
   }
+  .controls button,
+  .controls label {
+    font-size: 12px;
+  }
+  #turbo-button-label {
+    display: none;
+  }
+  .controls {
+    margin-top: -30px;
+  }
 }
 
 @media only screen and (max-width: 400px) {
