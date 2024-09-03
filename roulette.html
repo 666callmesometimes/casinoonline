@@ -182,10 +182,21 @@
             }
         });
 
+        let spinDegrees = [];
+
+        if (winningColor === 'black') {
+            spinDegrees = [0, 51, 154];
+        }
+        else if (winningColor === 'red') {
+            spinDegrees = [0, 85, 119, 154];
+        }
+    
+        let currentDegree = spinDegrees[Math.floor(Math.random() * spinDegrees.length)];
+
         // Kręcenie ruletką
         const board = document.getElementById('roulette-board');
         board.style.transition = `transform ${spinTime}ms ease-out`;
-        board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex}deg)`;
+        board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + currentDegree}deg)`;
 
         if (winningColor === 'green') {
             board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17}deg)`;
@@ -194,7 +205,12 @@
 
         setTimeout(() => {
             board.style.transition = '';
-            board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
+            board.style.transform = `rotate(${360 / sectors.length * winnerIndex + currentDegree}deg)`;
+
+            if (winningColor === 'green') {
+                board.style.transform = `rotate(${360 / sectors.length * winnerIndex + 17}deg)`;
+        }
+            
             sectors[winnerIndex].classList.add('winner');
 
            let resultMessage;
