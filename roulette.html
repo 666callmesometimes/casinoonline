@@ -50,6 +50,7 @@
 <div class="game-container">
     <h1>Roulette</h1>
     <div id="history-container"><span id="history"></span></div><br>
+    <div id="game-result"></div>
     <span class="controls">
     <br>
     <div class="bet-values">
@@ -190,17 +191,21 @@
             board.style.transform = `rotate(${360 * 5 + (360 / sectors.length) * winnerIndex + 17}deg)`;
         }
 
+
         setTimeout(() => {
             board.style.transition = '';
             board.style.transform = `rotate(${360 / sectors.length * winnerIndex}deg)`;
             sectors[winnerIndex].classList.add('winner');
 
+           let resultMessage;
             if (winningColor === chosenColor) {
                 const winnings = betAmount * (winningColor === 'green' ? 14 : 2);
                 addBalance(winnings);
-                alert(`You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`);
+                resultMessage = `You won! The ball landed on ${winningColor}. You earned ${winnings.toFixed(2)}`;
+                document.getElementById('game-result').innerText = resultMessage;
             } else {
-                alert(`You lost! The ball landed on ${winningColor}.`);
+                resultMessage = `You lost! The ball landed on ${winningColor}.`;
+                document.getElementById('game-result').innerText = resultMessage;
             }
 
             updateHistory(winningColor); // Aktualizacja historii

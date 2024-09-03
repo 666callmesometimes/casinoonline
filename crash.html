@@ -94,7 +94,7 @@
     </div>
 </div>
     <script>  
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('crash-chart');
     const ctx = canvas.getContext('2d');
     const betAmountInput = document.getElementById('bet-amount');
@@ -115,12 +115,11 @@
 
     var gameSpeed = 100;
 
-
-
     let isPlaying = false;
     let multiplier = 1.0;
     let cashoutMultiplier = null;
     let gameInterval;
+    let crashPoint;  // Zmienna do przechowywania wylosowanego punktu crasha
 
     // Wyświetlanie i aktualizacja balansu
     function getBalance() {
@@ -190,6 +189,9 @@
         startButton.disabled = true;
         cashoutButton.disabled = false;
 
+        // Losowanie punktu crasha na podstawie prawdopodobieństw
+        crashPoint = getCrashPoint();
+
         if (!isNaN(autoCashout) && autoCashout > 0) {
             cashoutMultiplier = autoCashout;
         }
@@ -211,7 +213,6 @@
         }
 
     function updateGame() {
-        const crashPoint = Math.random() * 2 + 1.00; // losowy crash point od 1.5 do 3.5
         multiplier += 0.01; // zwiększaj mnożnik o 0.01 na każdej iteracji
 
         // Rysowanie wykresu
@@ -261,6 +262,23 @@
             resultMessage.innerHTML = `You cashed out at ${multiplier.toFixed(2)}x and won <img src="img/coin.png" id="crash-coin" alt="coin" style="width: 16px;"> ${winnings.toFixed(2)}!`;
         } else {
             resultMessage.textContent = `The game crashed at ${multiplier.toFixed(2)}x. You lost!`;
+        }
+    }
+
+    // Funkcja do losowania punktu crasha na podstawie prawdopodobieństw
+    function getCrashPoint() {
+        const randomValue = Math.random() * 100;
+
+        if (randomValue < 50) {
+            return (Math.random() * (2.00 - 1.01) + 1.01).toFixed(2);
+        } else if (randomValue < 84) {
+            return (Math.random() * (4.00 - 2.01) + 2.01).toFixed(2);
+        } else if (randomValue < 94) {
+            return (Math.random() * (6.00 - 4.01) + 4.01).toFixed(2);
+        } else if (randomValue < 99) {
+            return (Math.random() * (10.00 - 6.01) + 6.01).toFixed(2);
+        } else {
+            return (Math.random() * (100.00 - 10.01) + 10.01).toFixed(2);
         }
     }
 

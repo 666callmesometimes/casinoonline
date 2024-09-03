@@ -50,12 +50,14 @@
 <div class="game-container">
     <h1>Cookie Clicker</h1>
     <div class="cookie-container">
+        <canvas id="particle-canvas"></canvas>
         <div class="cookie-background">
         <img src="img/cookie.png" alt="I'm a cookie! Click me!" id="cookie-button">
         </div>
     </div>
     <button id="upgrade-button">Upgrade Click (Cost: 10.00)</button>
 </div>
+
 
 <div id="settings-modal" class="modal">
     <div class="modal-content">
@@ -121,7 +123,7 @@
             if (getBalance() >= upgradeCost) {
                 subtractBalance(upgradeCost);
                 clickValue *= 2;
-                upgradeCost *= 3;
+                upgradeCost *= 4;
 
                 // Zapisanie nowych wartości w localStorage
                 localStorage.setItem('clickValue', clickValue.toFixed(2));
@@ -132,6 +134,66 @@
                 alert('Not enough balance to upgrade!');
             }
         });
+
+        //particles
+        const particleCanvas = document.getElementById('particle-canvas');
+const particleCtx = particleCanvas.getContext('2d');
+particleCanvas.width = particleCanvas.clientWidth;
+particleCanvas.height = particleCanvas.clientHeight;
+
+const particles = [];
+
+function createParticle(x, y) {
+    const size = Math.random() * 5 + 2;
+    const speedX = (Math.random() - 0.5) * 4;
+    const speedY = (Math.random() - 0.5) * 4;
+    const lifetime = 60; // Każda cząsteczka żyje przez 60 klatek
+    particles.push({ x, y, size, speedX, speedY, lifetime });
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.lifetime -= 1;
+        if (p.lifetime <= 0) {
+            particles.splice(i, 1); // Usuń cząsteczki, które się skończyły
+        }
+    }
+}
+
+function drawParticles() {
+    particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    particleCtx.fillStyle = 'saddlebrown'; // Kolor cząsteczek przypominający kolor ciastka
+    particles.forEach(p => {
+        particleCtx.beginPath();
+        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        particleCtx.fill();
+    });
+}
+
+function animateParticles() {
+    updateParticles();
+    drawParticles();
+    requestAnimationFrame(animateParticles);
+}
+
+animateParticles();
+
+document.getElementById('cookie-button').addEventListener('click', (e) => {
+    const rect = particleCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    for (let i = 0; i < 10; i++) {
+        createParticle(x, y);
+    }
+});
+
+
+//skinshop
+
+
 
         //OBSŁUGA MENU
 
@@ -237,7 +299,18 @@ applyPromo.onclick = function () {
             promoModal.style.display = 'none';
             isValid = false;
         }
-    }else {
+    }
+    else if (promoCode === 'CALLMESOMETIMES') {
+        if (isValid == true) {
+        const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
+        const newBalance = currentBalance + 300;
+        localStorage.setItem('balance', newBalance.toFixed(2));
+        alert('Promo code applied! Your balance has been increased by 300.00.');
+        updateBalanceDisplay();
+        promoModal.style.display = 'none';
+        isValid = false;
+        }
+    } else {
         alert('Invalid promo code!');
     }
 };

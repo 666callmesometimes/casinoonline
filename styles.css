@@ -264,12 +264,54 @@ h2 {
     align-items: center;
     padding: 2rem;
     height: 30vh;
+    position: relative;
 }
 .game-container{ 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+.skin-shop {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.skin {
+  display: inline-block;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.skin img {
+  width: 100px;
+  height: 100px;
+  border: 2px solid #ccc;
+  transition: border-color 0.3s;
+}
+
+.skin:hover img {
+  border-color: gold;
+}
+
+.skin p {
+  margin-top: 10px;
+}
+.cookie-background img {
+  width: 100%;
+  height: auto;
+}
+
+#particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -9;
+  pointer-events: none; /* Upewnij się, że canvas nie blokuje kliknięć */
+  background-color: #00000000;
+  border: none;
 }
 
 
@@ -400,7 +442,11 @@ h2 {
 .bet-choice button.disabled {
   opacity: 0.3;
 }
-
+#game-result {
+  min-height: 20px;
+  text-align: center;
+  width: 100%;
+}
 
 
 /*CRASH*/
@@ -602,18 +648,19 @@ input, button {
   .history-item {
     font-size: 10px;
     padding: 0;
+    color: #00000000;
   }
   .history-item.red {
-    color: #D03838;
     width: 24px;
+    color: #00000000;
   }
   .history-item.black {
-    color: #101010;
     width: 24px;
+    color: #00000000;
   }
   .history-item.green {
-    color: #359F59;
     width: 24px;
+    color: #00000000;
   }
   canvas {
     background-color: #222;
@@ -621,19 +668,20 @@ input, button {
     margin-top: 20px;
     width: 90%;
   }
-  .crash-controls button{
+  .crash-controls button,
+  .bet-options label,
+  .crash-button,
+  #max-bet-button {
     font-size: 12px;
     padding: 8px;
   }
-  .controls button,
-  .controls label {
-    font-size: 12px;
+  .bet-options {
+    text-align: center;
   }
-  #turbo-button-label {
-    display: none;
-  }
-  .controls {
-    margin-top: -30px;
+  #max-bet-button, 
+  #clear-bet-button {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
