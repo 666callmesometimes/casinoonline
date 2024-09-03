@@ -531,6 +531,38 @@ input, button {
 
 
 
+/*VAULT*/
+#vault-image {
+  width: 24rem;
+  transition: ease-in-out 200ms;
+}
+#vault-image:hover {
+  transform: scale(102%);
+}
+.vault-container {
+  text-align: center;
+}
+#timer {
+  color: #5B509F;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+#withdraw-button{
+  width: 20%;
+  padding: 1rem;
+  min-width: 18rem;
+  margin: 8px;
+}
+#withdraw-button:disabled,
+#deposit-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+
+
+
+
 
 /*MODALS*/
 .modal {
@@ -683,6 +715,9 @@ input, button {
     padding-left: 10px;
     padding-right: 10px;
   }
+  #vault-image {
+    width: 16rem;
+   }
 }
 
 @media only screen and (max-width: 400px) {

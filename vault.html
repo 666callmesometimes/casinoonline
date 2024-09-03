@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="balance.js"></script>
+    <title>Vault</title>
+    <link rel="shortcut icon" href="img/icon.png" type="image/x-icon">
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">
+            <img src="/img/logo.png" alt="logo">
+        </div>
+        <div class="nav-searchbar" id="searchbar"></div>
+    <div class="nav-menu" id="menu">
+        <div class="nav-navigation">
+        <a href="#" class="link-active">Home</a>
+        <a href="#">Games</a>
+        <span class="promo" id="promo">Promo</span>
+        <a href="#">Help</a>
+        <a href="roulette.html">Roulette</a>
+        <a href="diamond-sweeper.html">Diamond Sweeper</a>
+        <a href="cookie-clicker.html">Cookie Clicker</a>
+        <a href="crash.html">Crash</a>
+    </div>
+        <div class="nav-profile">
+            <div class="username" id="display-username">Username</div>
+            <div class="profile-picture">
+                <img id="profile-picture" src="">
+            </div>
+            <div class="nav-balance">
+                <img class="balance-icon" src="img/coin.png" alt="balance-icon">
+                <div id="balance-display"></div>
+                <button><img src="img/add.png" alt="add"></button>
+            </div>
+            <div class="nav-settings">
+                <img src="img/settings.png" alt="Settings" id="settings">
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-hamburger">
+        <img src="img/hamburger.png" alt="Menu" id="hamburger">
+    </div>
+</nav>
+
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="settings-close">&times;</span>
+        <h2>Settings</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username"><br><br>
+        <label for="profile-pic">Profile Picture URL:</label>
+        <input type="url" id="profile-pic" placeholder="Enter URL of profile picture"><br><br>
+        <button id="save-settings">Save</button>
+    </div>
+</div>
+
+<div id="promo-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="promo-close">&times;</span>
+        <h2>Promo Code</h2>
+        <br><br>
+        <label for="promo-code">Enter Promo Code:</label>
+        <input type="text" id="promo-code" placeholder="Enter your code">
+        <button id="apply-promo">Apply</button>
+    </div>
+</div>
+
+<div class="vault-container">
+    <h1>Vault</h1>
+    <p>Deposit your balance and earn 10% interest after 2 hours!</p>
+    <p id="timer">Time remaining: --:--:--</p> <!-- Timer -->
+    <img src="img/vault.png" alt="vault" id="vault-image" style="cursor: pointer;"> <!-- Grafika sejfu -->
+    <p>Current Amount: <span id="current-amount">0.00</span></p> <!-- Nagromadzony balance -->
+    <button id="withdraw-button" disabled>Withdraw</button> <!-- Przycisk Withdraw -->
+</div>
+
+<!-- Popup do depozytu -->
+<div id="deposit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="deposit-close">&times;</span>
+        <h2>Deposit to Vault</h2>
+        <label for="deposit-amount">Enter amount:</label>
+        <input type="number" id="deposit-amount" placeholder="Enter amount to deposit">
+        <button id="deposit-button">Deposit</button>
+        <p id="deposit-status"></p> <!-- Status depozytu -->
+    </div>
+</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const vaultImage = document.getElementById('vault-image');
+    const depositButton = document.getElementById('deposit-button');
+    const withdrawButton = document.getElementById('withdraw-button');
+    const vaultInfo = document.getElementById('current-amount');
+    const timerDisplay = document.getElementById('timer');
+    const depositModal = document.getElementById('deposit-modal');
+    const depositClose = document.getElementById('deposit-close');
+    const depositStatus = document.getElementById('deposit-status');
+
+    let depositAmount = parseFloat(localStorage.getItem('vaultAmount')) || 0;
+    let depositTime = parseFloat(localStorage.getItem('vaultTime')) || 0;
+    const interestRate = 0.10;
+    const withdrawalDelay = 2 * 60 * 60 * 1000; // 2 godziny (7200 sekund)
+
+    updateVaultStatus();
+    startTimer();
+
+    vaultImage.addEventListener('click', () => {
+        if (depositAmount > 0) {
+            depositStatus.textContent = `You have already deposited ${depositAmount.toFixed(2)}.`;
+            depositButton.disabled = true;
+        } else {
+            depositStatus.textContent = '';
+            depositButton.disabled = false;
+        }
+        depositModal.style.display = 'block';
+    });
+
+    depositClose.addEventListener('click', () => {
+        depositModal.style.display = 'none';
+    });
+
+    depositButton.addEventListener('click', () => {
+        const amount = parseFloat(document.getElementById('deposit-amount').value);
+        const currentBalance = getBalance(); // Używamy funkcji z balance.js
+
+        if (amount > 0 && amount <= currentBalance) {
+            subtractBalance(amount); // Odejmujemy balans, używając funkcji z balance.js
+            depositAmount = amount;
+            depositTime = Date.now();
+
+            localStorage.setItem('vaultAmount', depositAmount);
+            localStorage.setItem('vaultTime', depositTime);
+
+            alert(`Successfully deposited ${amount.toFixed(2)}! Come back in 2 hours to withdraw with interest.`);
+            depositButton.disabled = true;
+            depositModal.style.display = 'none';
+            updateVaultStatus();
+            startTimer();
+        } else {
+            alert('Invalid amount or insufficient balance!');
+        }
+    });
+
+    withdrawButton.addEventListener('click', () => {
+        if (depositAmount > 0 && isWithdrawalAvailable()) {
+            const interest = depositAmount * interestRate;
+            const totalAmount = depositAmount + interest;
+
+            addBalance(totalAmount); // Dodajemy balans, używając funkcji z balance.js
+            alert(`You have successfully withdrawn ${totalAmount.toFixed(2)}!`);
+
+            resetVault();
+        } else {
+            alert('Withdrawal is not available yet. Please wait for the timer to end.');
+        }
+    });
+
+    function updateVaultStatus() {
+        vaultInfo.innerHTML = `<img src="img/coin.png" alt="coin" style="width: 16px; height: 16px;"> ${depositAmount.toFixed(2)}`;
+        withdrawButton.disabled = !isWithdrawalAvailable();
+    }
+
+    function startTimer() {
+        if (depositAmount > 0) {
+            const timerInterval = setInterval(() => {
+                const elapsedTime = Date.now() - depositTime;
+                const remainingTime = withdrawalDelay - elapsedTime;
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = 'Time remaining: 00:00:00';
+                    vaultInfo.innerHTML = `<img src="img/coin.png" alt="coin" style="width: 16px; height: 16px;"> ${(depositAmount + depositAmount * interestRate).toFixed(2)}`;
+                    withdrawButton.disabled = false;
+                } else {
+                    const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+                    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+                    timerDisplay.textContent = `Time remaining: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    // Animowane zwiększanie balansu w sejfie
+                    const partialInterest = depositAmount * interestRate * (elapsedTime / withdrawalDelay);
+                    vaultInfo.innerHTML = `<img src="img/coin.png" alt="coin" style="width: 16px; height: 16px;"> ${(depositAmount + partialInterest).toFixed(2)}`;
+                }
+            }, 1000);
+        }
+    }
+
+    function isWithdrawalAvailable() {
+        const currentTime = Date.now();
+        return currentTime - depositTime >= withdrawalDelay;
+    }
+
+    function resetVault() {
+        depositAmount = 0;
+        depositTime = 0;
+        localStorage.removeItem('vaultAmount');
+        localStorage.removeItem('vaultTime');
+        updateVaultStatus();
+    }
+});
+
+
+//OBSŁUGA MENU
+
+const menuBtn = document.getElementById("hamburger");
+    const menu = document.getElementById("menu");
+
+    menuBtn.addEventListener('click', function(){
+        menu.classList.toggle("menu-open");
+    });
+
+    //MODAL
+const settingsModal = document.getElementById('settings-modal');
+const settingsBtn = document.getElementById('settings');
+const settingsClose = document.getElementById('settings-close');
+const saveSettings = document.getElementById('save-settings');
+
+settingsBtn.onclick = function () {
+    settingsModal.style.display = 'block';
+};
+
+settingsClose.onclick = function () {
+    settingsModal.style.display = 'none';
+};
+
+saveSettings.onclick = function () {
+    const username = document.getElementById('username').value;
+    const profilePic = document.getElementById('profile-pic').value;
+
+    if (username) {
+        localStorage.setItem('username', username);
+        document.getElementById('display-username').textContent = username;
+    }
+
+    if (profilePic) {
+        localStorage.setItem('profilePic', profilePic);
+        document.getElementById('profile-picture').src = profilePic;
+    }
+
+    settingsModal.style.display = 'none';
+};
+
+// Ładowanie ustawień z localStorage
+window.onload = function () {
+    const savedUsername = localStorage.getItem('username');
+    const savedProfilePic = localStorage.getItem('profilePic');
+
+    if (savedUsername) {
+        document.getElementById('display-username').textContent = savedUsername;
+    }
+
+    if (savedProfilePic) {
+        document.getElementById('profile-picture').src = savedProfilePic;
+    }
+};
+
+
+// Promo Modal
+const promoModal = document.getElementById('promo-modal');
+const promoBtn = document.getElementById('promo');
+const promoClose = document.getElementById('promo-close');
+const applyPromo = document.getElementById('apply-promo');
+let isValid = true;
+
+promoBtn.onclick = function () {
+    promoModal.style.display = 'block';
+};
+
+promoClose.onclick = function () {
+    promoModal.style.display = 'none';
+};
+
+applyPromo.onclick = function () {
+    const promoCode = document.getElementById('promo-code').value;
+
+    if (promoCode === 'SKIBIDI20') {
+        if (isValid == true) {
+        const currentBalance = parseFloat(localStorage.getItem('balance')) || 0;
+        const newBalance = currentBalance + 20;
+        localStorage.setItem('balance', newBalance.toFixed(2));
+        alert('Promo code applied! Your balance has been increased by 20.00.');
+        updateBalanceDisplay();
+        promoModal.style.display = 'none';
+        isValid = false;
+        }
+    } 
+    else if (promoCode === 'MILIARDER') {
+        if (isValid == true) {
+            // Reset balansu, kosztu upgrade i wartości kliknięcia
+            const newBalance = 0;
+            clickValue = 0.01;
+            upgradeCost = 10.00;
+
+            // Zapisanie nowych wartości w localStorage
+            localStorage.setItem('balance', newBalance.toFixed(2));
+            localStorage.setItem('clickValue', clickValue.toFixed(2));
+            localStorage.setItem('upgradeCost', upgradeCost.toFixed(2));
+
+            // Aktualizacja wyświetlacza balansu oraz przycisku ulepszenia
+            alert('Promo code applied! Your balance is reset and click value is set to 0.01.');
+            updateBalanceDisplay();
+            document.getElementById('upgrade-button').innerText = `Upgrade Click (Cost: ${upgradeCost.toFixed(2)})`;
+
+            promoModal.style.display = 'none';
+            isValid = false;
+        }
+    }else {
+        alert('Invalid promo code!');
+    }
+};
+    </script>
+</body>
+</html>
